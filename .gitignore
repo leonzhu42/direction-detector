@@ -27,6 +27,7 @@
 *.exe
 *.out
 *.app
+direction_detector
 
 # CMake Generated Files
 /CMakeFiles
