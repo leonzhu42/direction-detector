@@ -37,3 +37,6 @@ Makefile
 
 # Test images
 /scenes
+
+# Visual Studio Code Files
+/.vscode
