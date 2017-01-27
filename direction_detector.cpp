@@ -59,8 +59,11 @@ $\theta$ is the angle of view of the camera.
 */
 
 double posAngle(Double2 vp, int height, int width) {
+    /*
     double dx = vp.c[0] - double(width) / 2;
     return atan(dx / (CAM_SPIN_DIS + float(height) / 2 / tan(ANGLE_OF_VIEW / 2)));
+    */
+    return atan(vp.c[0] - double(width) / 2 / (CAM_SPIN_DIS + float(height) / 2 / tan(ANGLE_OF_VIEW / 2)));
 }
 
 /*
@@ -72,17 +75,23 @@ Steps for Vanishing Point Detection:
 */
 
 double lineSlope(Vec4i line) {
+    /*
     double dy = line[1] - line[3];
     double dx = line[0] - line[2];
     return dy / dx;
+    */
+    return (line[1] - line[3]) / (line[0] / line[2]);
 }
 
 double lineBias(Vec4i line) {
+    /*
     double a = line[0];
     double b = line[1];
     double c = line[2];
     double d = line[3];
     return (a * d - b * c) / (a - c);
+    */
+    return (line[0] * line[3] - line[1] * line[2]) / (line[0] - line[2]);
 }
 
 double lineLength(Vec4i line) {
