@@ -54,3 +54,7 @@ bool pointInImage(Double2 point, int height, int width) {
     double y = point.c[1];
     return x >= 0 && x <= width && y >= 0 && y <= height;
 }
+
+double pointsDistance(Double2 point1, Double2 point2) {
+    return sqrt((point1.c[0] - point2.c[0]) * (point1.c[0] - point2.c[0]) + (point1.c[1] - point2.c[1]) * (point1.c[1] - point2.c[1]));
+}

@@ -15,11 +15,13 @@ int canny_low_threshold = 100;
 const int CANNY_MAX_LOW_THRESHOLD = 100;
 const int canny_ratio = 3;
 
-int hough_low_threshold = 30;
+int hough_low_threshold = 200;
 const int HOUGH_MAX_LOW_THRESHOLD = 500;
 
 const double MIN_SLOPE_THRESHOLD = 0.1;
 const double MAX_SLOPE_THRESHOLD = 10;
+
+const double CLUSTER_DIS_THRESHOLD = 0.1;
 
 const double CAM_SPIN_DIS = 0;
 const double ANGLE_OF_VIEW = 90 * CV_PI / 180;
@@ -42,7 +44,7 @@ double posAngle(Double2 vp, int height, int width) {
     double dx = vp.c[0] - double(width) / 2;
     return atan(dx / (CAM_SPIN_DIS + float(height) / 2 / tan(ANGLE_OF_VIEW / 2)));
     */
-    return atan(vp.c[0] - double(width) / 2 / (CAM_SPIN_DIS + float(height) / 2 / tan(ANGLE_OF_VIEW / 2)));
+    return atan((vp.c[0] - double(width) / 2) / (CAM_SPIN_DIS + float(height) / 2 / tan(ANGLE_OF_VIEW / 2)));
 }
 
 /*
@@ -50,7 +52,8 @@ Steps for Vanishing Point Detection:
 1. Drop the lines with slopes that are too great or too little; other lines are denoted as L_i
 2. Calculate V_{i,j}=\intersect{L_i, L_j}
 3. Drop V_{i,j} that is outside the border of the image
-4. For the rest, the result V=\frac{\sum{V_{i,j}\times{{Len_i}\times{Len_j}}}}{\sum{{Len_i}\times{Len_j}}
+4. Decide the perspective mode (1/2 vanishing point(s))
+5. For the rest, the result V=\frac{\sum{V_{i,j}\times{{Len_i}\times{Len_j}}}}{\sum{{Len_i}\times{Len_j}}
 */
 
 Double2 vanishingPoint(std::vector<Vec4i> lines, int height, int width) {
@@ -87,20 +90,61 @@ Double2 vanishingPoint(std::vector<Vec4i> lines, int height, int width) {
         circle(color_dst, pt, 2, Scalar(0, 255, 0));
     }
 
-    // Step 4
-    double x_up = 0, x_down = 0, y_up = 0, y_down = 0;
+    // Step 4 & 5
+    size_t num_clusters = 0;
+    std::vector<long> cluster_belonging(vps.size(), -1);
+    std::vector<Double2> cluster_center;
+    std::vector<bool> visited(vps.size(), false);
+
     for (size_t i = 0; i < vps.size(); ++i) {
-        double x = vps[i].c[0];
-        double y = vps[i].c[1];
-        size_t ind_line1 = ind_vps_lines[i].s[0];
-        size_t ind_line2 = ind_vps_lines[i].s[1];
-        double mul_length = lineLength(lines[ind_line1]) * lineLength(lines[ind_line2]);
-        x_up += x * mul_length;
-        y_up += y * mul_length;
-        x_down += mul_length;
-        y_down += mul_length;
+        if (visited[i])
+            continue;
+        else {
+            visited[i] = true;
+            cluster_belonging[i] = num_clusters++;
+            cluster_center.push_back(vps[i]);
+        }
+        for (size_t j = i + 1; j < vps.size(); ++j) {
+            if (pointsDistance(cluster_center[cluster_belonging[i]], vps[j]) < CLUSTER_DIS_THRESHOLD * width) {
+                // Include vps[j] into this cluster
+                visited[j] = true;
+                cluster_belonging[j] = cluster_belonging[i];
+
+                // Update cluster_center
+                double x_up = 0, x_down = 0, y_up = 0, y_down = 0;
+                for (size_t k = 0; k < vps.size(); ++k)
+                    if (cluster_belonging[k] == cluster_belonging[i]) {
+                        double x = vps[k].c[0];
+                        double y = vps[k].c[1];
+                        size_t ind_line1 = ind_vps_lines[k].s[0];
+                        size_t ind_line2 = ind_vps_lines[k].s[1];
+                        double mul_length = lineLength(lines[ind_line1]) * lineLength(lines[ind_line2]);
+                        x_up += x * mul_length;
+                        y_up += y * mul_length;
+                        x_down += mul_length;
+                        y_down += mul_length;
+                    }
+                cluster_center[cluster_belonging[i]] = Double2(x_up / x_down, y_up / y_down);
+            }
+        }
     }
-    return Double2(x_up / x_down, y_up / y_down);
+
+    std::vector<size_t> cluster_sizes(num_clusters, 0);
+    for (size_t i = 0; i < vps.size(); ++i)
+        cluster_sizes[cluster_belonging[i]]++;
+    
+    size_t max_cluster_size = 0;
+    size_t ind_largest_cluster = -1;
+    for (size_t i = 0; i < num_clusters; ++i)
+        if (cluster_sizes[i] > max_cluster_size) {
+            max_cluster_size = cluster_sizes[i];
+            ind_largest_cluster = i;
+        }
+
+    if (ind_largest_cluster == -1)
+        return Double2(-1, -1);
+    else    
+        return cluster_center[ind_largest_cluster];
 }
 
 void detectLines(int = 0, void* = 0) {
@@ -120,6 +164,10 @@ void detectLines(int = 0, void* = 0) {
 
     Double2 vp = vanishingPoint(lines, src.rows, src.cols);
     std::cout << "(x, y) = (" << vp.c[0] << ", " << vp.c[1] << ")" << std::endl;
+
+    if (vp.c[0] == -1 && vp.c[1] == -1)
+        return;
+
     Point pt = Point(vp.c[0], vp.c[1]);
     circle(color_dst, pt, 4, Scalar(255, 0, 255));
 
@@ -141,6 +189,7 @@ int main(int argc, char** argv) {
         cap.open(0);
         while (true) {
             cap.read(src);
+            std::cout << src.rows << " * " << src.cols << std::endl;
 
             detectLines();
 
@@ -155,6 +204,7 @@ int main(int argc, char** argv) {
         createTrackbar("Canny Min Threshold:", "Detected Lines", &canny_low_threshold, CANNY_MAX_LOW_THRESHOLD, detectLines);
         createTrackbar("Hough Min Threshold:", "Detected Lines", &hough_low_threshold, HOUGH_MAX_LOW_THRESHOLD, detectLines);
         src = imread(argv[1], 1);
+        std::cout << src.rows << " * " << src.cols << std::endl;
 
         detectLines();
 
