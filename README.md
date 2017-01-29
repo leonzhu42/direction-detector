@@ -1,0 +1,10 @@
+# direction-detector
+
+Direction detector calculates the angle of perspective by locating the vanishing point(s) in the image.
+
+Usage:
+
+1. Camera mode: `./direction-detector`
+2. Picture mode: `./direction-detector [path-to-picture]`
+
+To build the project, OpenCV should be installed.
