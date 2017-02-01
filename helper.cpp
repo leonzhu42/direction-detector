@@ -20,7 +20,6 @@ double lineSlope(Vec4i line) {
     double dx = line[0] - line[2];
     return dy / dx;
     */
-    // std::cout << double(line[1] - line[3]) << ' ' << double(line[0] - line[2]) << std::endl;
     return double(line[1] - line[3]) / double(line[0] - line[2]);
 }
 
@@ -49,10 +48,19 @@ Double2 linesIntersect(Vec4i line1, Vec4i line2) {
     return Double2(x, y);
 }
 
+/*
 bool pointInImage(Double2 point, int height, int width) {
     double x = point.c[0];
     double y = point.c[1];
     return x >= 0 && x <= width && y >= 0 && y <= height;
+}
+*/
+
+bool intersectIsPillar(Vec4i line1, Vec4i line2, Double2 intersection) { 
+    if (intersection.c[1] - std::max(std::max(line1[1], line1[3]), std::max(line2[1], line2[3])) >= -10)
+        return true;
+    else
+        return false;
 }
 
 double pointsDistance(Double2 point1, Double2 point2) {

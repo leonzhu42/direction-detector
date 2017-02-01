@@ -25,6 +25,8 @@ double lineLength(Vec4i line);
 
 Double2 linesIntersect(Vec4i line1, Vec4i line2);
 
-bool pointInImage(Double2 point, int height, int width);
+//bool pointInImage(Double2 point, int height, int width);
+
+bool intersectIsPillar(Vec4i line1, Vec4i line2, Double2 intersection);
 
 double pointsDistance(Double2 point1, Double2 point2);

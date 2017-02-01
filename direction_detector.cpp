@@ -77,8 +77,10 @@ Double2 vanishingPoint(std::vector<Vec4i> lines, int height, int width) {
     std::vector<Size_t2> ind_vps_lines;
     for (size_t i = 0; i < ind_filtered_lines.size(); ++i)
         for (size_t j = 0; j < i; ++j) {
-            Double2 vp = linesIntersect(lines[ind_filtered_lines[i]], lines[ind_filtered_lines[j]]);
-            if (pointInImage(vp, height, width)) {
+            Vec4i line1 = lines[ind_filtered_lines[i]];
+            Vec4i line2 = lines[ind_filtered_lines[j]];
+            Double2 vp = linesIntersect(line1, line2);
+            if (!intersectIsPillar(line1, line2, vp)) {
                 vps.push_back(vp);
                 ind_vps_lines.push_back(Size_t2(j, i));
             }
