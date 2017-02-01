@@ -95,6 +95,7 @@ Double2 vanishingPoint(std::vector<Vec4i> lines, int height, int width) {
     // Step 4 & 5
     size_t num_clusters = 0;
     std::vector<long> cluster_belonging(vps.size(), -1);
+    std::vector<std::vector<size_t> > ind_clusters_vps;
     std::vector<Double2> cluster_center;
     std::vector<bool> visited(vps.size(), false);
 
@@ -105,27 +106,30 @@ Double2 vanishingPoint(std::vector<Vec4i> lines, int height, int width) {
             visited[i] = true;
             cluster_belonging[i] = num_clusters++;
             cluster_center.push_back(vps[i]);
+            ind_clusters_vps.push_back(std::vector<size_t>());
+            ind_clusters_vps[cluster_belonging[i]].push_back(i);
         }
         for (size_t j = i + 1; j < vps.size(); ++j) {
             if (pointsDistance(cluster_center[cluster_belonging[i]], vps[j]) < CLUSTER_DIS_THRESHOLD * width) {
                 // Include vps[j] into this cluster
                 visited[j] = true;
                 cluster_belonging[j] = cluster_belonging[i];
+                ind_clusters_vps[cluster_belonging[i]].push_back(j);
 
                 // Update cluster_center
                 double x_up = 0, x_down = 0, y_up = 0, y_down = 0;
-                for (size_t k = 0; k < vps.size(); ++k)
-                    if (cluster_belonging[k] == cluster_belonging[i]) {
-                        double x = vps[k].c[0];
-                        double y = vps[k].c[1];
-                        size_t ind_line1 = ind_vps_lines[k].s[0];
-                        size_t ind_line2 = ind_vps_lines[k].s[1];
-                        double mul_length = lineLength(lines[ind_line1]) * lineLength(lines[ind_line2]);
-                        x_up += x * mul_length;
-                        y_up += y * mul_length;
-                        x_down += mul_length;
-                        y_down += mul_length;
-                    }
+                std::vector<size_t> ind_cluster_vps = ind_clusters_vps[cluster_belonging[i]];
+                for (size_t k = 0; k < ind_cluster_vps.size(); ++k) {
+                    double x = vps[ind_cluster_vps[k]].c[0];
+                    double y = vps[ind_cluster_vps[k]].c[1];
+                    size_t ind_line1 = ind_vps_lines[ind_cluster_vps[k]].s[0];
+                    size_t ind_line2 = ind_vps_lines[ind_cluster_vps[k]].s[1];
+                    double mul_length = lineLength(lines[ind_line1]) * lineLength(lines[ind_line2]);
+                    x_up += x * mul_length;
+                    y_up += y * mul_length;
+                    x_down += mul_length;
+                    y_down += mul_length;
+                }
                 cluster_center[cluster_belonging[i]] = Double2(x_up / x_down, y_up / y_down);
             }
         }
