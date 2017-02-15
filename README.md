@@ -7,9 +7,11 @@ Usage:
 1. Camera mode: `./direction-detector`
 2. Picture mode: `./direction-detector [path-to-image]`
 
-To build the project, OpenCV and cmake should be installed.
+To build the project on Linux, OpenCV and cmake should be installed.
 
 Steps:
 
 1. `cmake .`
 2. `make`
+
+To build the project on Windows, OpenCV and Visual Studio should be installed.
