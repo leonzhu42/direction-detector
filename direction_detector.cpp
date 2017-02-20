@@ -13,7 +13,7 @@ const int BLUR_KERNEL = 3;
 
 int canny_low_threshold = 100;
 const int CANNY_MAX_LOW_THRESHOLD = 100;
-const int canny_ratio = 3;
+const int canny_ratio = 2;
 
 int hough_low_threshold = 200;
 const int HOUGH_MAX_LOW_THRESHOLD = 500;
@@ -99,7 +99,7 @@ Double2 vanishingPoint(std::vector<Vec4i> lines, int height, int width) {
     std::vector<Double2> cluster_center;
     std::vector<bool> visited(vps.size(), false);
 
-    for (size_t i = 0; i < vps.size(); ++i) {
+	for (size_t i = 0; i < vps.size(); ++i) {
         if (visited[i])
             continue;
         else {
