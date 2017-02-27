@@ -9,7 +9,7 @@
 
 using namespace cv;
 
-const int BLUR_KERNEL = 3;
+// const int BLUR_KERNEL = 3;
 
 int canny_low_threshold = 100;
 const int CANNY_MAX_LOW_THRESHOLD = 100;
@@ -153,7 +153,7 @@ Double2 vanishingPoint(std::vector<Vec4i> lines, int height, int width) {
 }
 
 void detectLines(int = 0, void* = 0) {
-    blur(src, dst, Size(BLUR_KERNEL, BLUR_KERNEL));
+    // blur(src, dst, Size(BLUR_KERNEL, BLUR_KERNEL));
 
     Canny(src, dst, canny_low_threshold, canny_low_threshold * canny_ratio, 3);
 
