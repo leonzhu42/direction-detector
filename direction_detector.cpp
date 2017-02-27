@@ -118,12 +118,11 @@ Double2 vanishingPoint(std::vector<Vec4i> lines, int height, int width) {
 
                 // Update cluster_center
                 double x_up = 0, x_down = 0, y_up = 0, y_down = 0;
-                std::vector<size_t> ind_cluster_vps = ind_clusters_vps[cluster_belonging[i]];
-                for (size_t k = 0; k < ind_cluster_vps.size(); ++k) {
-                    double x = vps[ind_cluster_vps[k]].c[0];
-                    double y = vps[ind_cluster_vps[k]].c[1];
-                    size_t ind_line1 = ind_vps_lines[ind_cluster_vps[k]].s[0];
-                    size_t ind_line2 = ind_vps_lines[ind_cluster_vps[k]].s[1];
+                for (size_t k = 0; k < ind_clusters_vps[cluster_belonging[i]].size(); ++k) {
+                    double x = vps[ind_clusters_vps[cluster_belonging[i]][k]].c[0];
+                    double y = vps[ind_clusters_vps[cluster_belonging[i]][k]].c[1];
+                    size_t ind_line1 = ind_vps_lines[ind_clusters_vps[cluster_belonging[i]][k]].s[0];
+                    size_t ind_line2 = ind_vps_lines[ind_clusters_vps[cluster_belonging[i]][k]].s[1];
                     double mul_length = lineLength(lines[ind_line1]) * lineLength(lines[ind_line2]);
                     x_up += x * mul_length;
                     y_up += y * mul_length;
