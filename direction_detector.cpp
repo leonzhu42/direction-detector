@@ -59,7 +59,7 @@ Steps for Vanishing Point Detection:
 Double2 vanishingPoint(std::vector<Vec4i> lines, int height, int width) {
     // Step 1
     std::vector<size_t> ind_filtered_lines;
-    for (size_t i = 0; i < lines.size(); ++i)        
+    for (size_t i = 0; i < lines.size(); ++i)
         if (!(lines[i][0] == lines[i][2] ||
             abs(lineSlope(lines[i])) < MIN_SLOPE_THRESHOLD ||
             abs(lineSlope(lines[i])) > MAX_SLOPE_THRESHOLD))
