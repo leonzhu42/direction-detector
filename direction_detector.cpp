@@ -56,7 +56,7 @@ Steps for Vanishing Point Detection:
 5. For the rest, the result V=\frac{\sum{V_{i,j}\times{{Len_i}\times{Len_j}}}}{\sum{{Len_i}\times{Len_j}}
 */
 
-Double2 vanishingPoint(std::vector<Vec4i> lines, int height, int width) {
+Double2 vanishingPoint(std::vector<Vec4i> &lines, int height, int width) {
     // Step 1
     std::vector<size_t> ind_filtered_lines;
     for (size_t i = 0; i < lines.size(); ++i)
@@ -201,7 +201,7 @@ int main(int argc, char** argv) {
             imshow("Source", src);
             imshow("Detected Lines", color_dst);
 
-            if (waitKey(100) < 255)
+            if (waitKey(50) < 255)
                 break;
         }
     } else {
