@@ -14,7 +14,7 @@ Size_t2::Size_t2(size_t a, size_t b) {
     s[1] = b;
 }
 
-double lineSlope(Vec4i line) {
+double lineSlope(Vec4i &line) {
     /*
     double dy = line[1] - line[3];
     double dx = line[0] - line[2];
@@ -23,7 +23,7 @@ double lineSlope(Vec4i line) {
     return double(line[1] - line[3]) / double(line[0] - line[2]);
 }
 
-double lineBias(Vec4i line) {
+double lineBias(Vec4i &line) {
     /*
     double a = line[0];
     double b = line[1];
@@ -34,11 +34,11 @@ double lineBias(Vec4i line) {
     return double(line[0] * line[3] - line[1] * line[2]) / double(line[0] - line[2]);
 }
 
-double lineLength(Vec4i line) {
+double lineLength(Vec4i &line) {
     return sqrt((line[0] - line[2]) * (line[0] - line[2]) + (line[1] - line[3]) * (line[1] - line[3]));
 }
 
-Double2 linesIntersect(Vec4i line1, Vec4i line2) {
+Double2 linesIntersect(Vec4i &line1, Vec4i &line2) {
     double a = lineSlope(line1);
     double b = lineBias(line1);
     double c = lineSlope(line2);
@@ -56,13 +56,13 @@ bool pointInImage(Double2 point, int height, int width) {
 }
 */
 
-bool intersectIsPillar(Vec4i line1, Vec4i line2, Double2 intersection) { 
+bool intersectIsPillar(Vec4i &line1, Vec4i &line2, Double2 &intersection) { 
     if (intersection.c[1] - std::max(std::max(line1[1], line1[3]), std::max(line2[1], line2[3])) >= -10)
         return true;
     else
         return false;
 }
 
-double pointsDistance(Double2 point1, Double2 point2) {
+double pointsDistance(Double2 &point1, Double2 &point2) {
     return sqrt((point1.c[0] - point2.c[0]) * (point1.c[0] - point2.c[0]) + (point1.c[1] - point2.c[1]) * (point1.c[1] - point2.c[1]));
 }
